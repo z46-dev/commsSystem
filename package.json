@@ -1,0 +1,13 @@
+{
+    "name": "comms-system",
+    "version": "v1.0.0",
+    "description": "A simple communication system",
+    "main": "index.js",
+    "type": "module",
+    "scripts": {
+        "start": "node index.js"
+    },
+    "engines": {
+        "node": ">=18.0.0"
+    }
+}
