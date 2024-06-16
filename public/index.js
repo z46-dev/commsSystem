@@ -31,6 +31,10 @@ for (const key in data) {
     const section = document.createElement("div");
     section.classList.add("section");
 
+    const header = document.createElement("h1");
+    header.innerText = key;
+    section.appendChild(header);
+
     if ("location" in data[key]) {
         const subSection = document.createElement("div");
         subSection.classList.add("subSection");
@@ -69,7 +73,7 @@ for (const key in data) {
         const subSection = document.createElement("div");
         subSection.classList.add("subSection");
 
-        const header = document.createElement("h3");
+        const header = document.createElement("h2");
         header.innerText = "System";
         subSection.appendChild(header);
 
