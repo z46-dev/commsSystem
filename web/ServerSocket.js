@@ -92,6 +92,9 @@ export default class ServerSocket {
             case packetTypes.MESSAGE:
                 this.#emit("message", reader.getStringUTF8());
                 break;
+            case packetTypes.DATA:
+                this.#emit("data", JSON.parse(reader.getStringUTF8()));
+                break;
         }
     }
 }

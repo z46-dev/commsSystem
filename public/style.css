@@ -1,0 +1,28 @@
+* {
+    font-family: sans-serif;
+    font-weight: bold;
+}
+
+html, body {
+    margin: 0px;
+    padding: 0px;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.section {
+    margin: 2vmin;
+    padding: 1vmin;
+    border-radius: 1vmin;
+    background-color: rgba(0, 0, 0, .1);
+}
+
+.section .subSection {
+    margin: 1vmin;
+    padding: 1vmin;
+    border-radius: 1vmin;
+    background-color: rgba(0, 0, 0, .1);
+}

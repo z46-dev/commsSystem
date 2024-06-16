@@ -17,7 +17,6 @@ export default class ClientSocket {
 
         this.keyX = 1n;
         this.keyY = 1n;
-        this.keyMod = 1n;
         this.fromServerKeys = [1n, 1n, 1n, 1n];
         this.toServerKeys = [1n, 1n, 1n, 1n];
 
@@ -46,10 +45,9 @@ export default class ClientSocket {
         }
     }
 
-    setKeys(x, y, mod, fromServer, toServer) {
+    setKeys(x, y, fromServer, toServer) {
         this.keyX = x;
         this.keyY = y;
-        this.keyMod = mod;
         this.fromServerKeys = fromServer;
         this.toServerKeys = toServer;
 
@@ -79,6 +77,7 @@ export default class ClientSocket {
                 writer.setStringUTF8(data[1]);
                 break;
             case packetTypes.MESSAGE:
+            case packetTypes.DATA:
                 writer.setStringUTF8(data);
                 break;
             case packetTypes.TERMINATE:

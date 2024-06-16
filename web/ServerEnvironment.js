@@ -1,5 +1,6 @@
 import net from "net";
 import ServerSocket from "./ServerSocket.js";
+import { DataStructure } from "../lib/dataParsers.js";
 
 export default class ServerEnvironment {
     #logins = new Map();
@@ -16,9 +17,11 @@ export default class ServerEnvironment {
 
         this.keyX = 1n;
         this.keyY = 1n;
-        this.keyMod = 1n;
         this.toClientKeys = [1n, 1n, 1n, 1n];
         this.fromClientKeys = [1n, 1n, 1n, 1n];
+
+        /** @type {Map<string,DataStructure>} */
+        this.lastDatas = new Map();
     }
 
     #listener(socket) {
@@ -43,12 +46,12 @@ export default class ServerEnvironment {
         });
 
         serverSocket.on("message", m => console.log(`Message from ${serverSocket.username}: ${m}`));
+        serverSocket.on("data", data => (this.lastDatas[serverSocket.username] = data));
     }
 
-    setKeys(x, y, mod, fromClient, toClient) {
+    setKeys(x, y, fromClient, toClient) {
         this.keyX = x;
         this.keyY = y;
-        this.keyMod = mod;
         this.fromClientKeys = fromClient;
         this.toClientKeys = toClient;
     }
@@ -63,5 +66,9 @@ export default class ServerEnvironment {
 
     start() {
         this.#server.listen(this.port, () => console.log(`Server listening on port ${this.port}`));
+    }
+
+    stop() {
+        this.#server.close();
     }
 }
