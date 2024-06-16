@@ -77,7 +77,7 @@ for (const key in data) {
             const subSubSection = document.createElement("div");
             subSubSection.classList.add("subSection");
 
-            const header = document.createElement("h4");
+            const header = document.createElement("h3");
             header.innerText = parseStringKey($key);
             subSubSection.appendChild(header);
 
