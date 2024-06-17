@@ -27,7 +27,10 @@ export default class ServerEnvironment {
     #listener(socket) {
         const serverSocket = new ServerSocket(this, socket);
 
-        serverSocket.on("validated", () => this.sockets.set(serverSocket.username, serverSocket));
+        serverSocket.on("validated", () => {
+            this.sockets.set(serverSocket.username, serverSocket);
+            console.log(`Connection validated as ${serverSocket.username}`);
+        });
 
         serverSocket.on("close", () => {
             console.log("Connection closed");
@@ -47,6 +50,16 @@ export default class ServerEnvironment {
 
         serverSocket.on("message", m => console.log(`Message from ${serverSocket.username}: ${m}`));
         serverSocket.on("data", data => (this.lastDatas[serverSocket.username] = data));
+    }
+
+    onSocket(socket) {
+        if (!(socket instanceof net.Socket)) {
+            throw new TypeError("The argument 'socket' must be a valid Socket object!");
+        }
+
+        if (this.#server) {
+            this.#server.emit("connection", socket);
+        }
     }
 
     setKeys(x, y, fromClient, toClient) {

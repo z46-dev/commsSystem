@@ -4,7 +4,7 @@ import packetTypes from "./lib/packetTypes.js";
 import ServerEnvironment from "./web/ServerEnvironment.js";
 import ClientSocket from "./web/ClientSocket.js";
 import { getLocationData, getSystemData, getWeatherDataAtMe } from "./lib/dataParsers.js";
-import Server from "./lib/Server.js";
+import DualServer from "./lib/DualServer.js";
 
 const envOptions = ["HOST", "PORT", "LOGINS", "PRIMEN_X", "PRIMEN_Y", "INBOUND_SEED", "OUTBOUND_SEED", "DATA_FLAGS", "RUN_SERVER", "RUN_CLIENT", "RUN_WEBSITE", "WEBSITE_PORT", "WEBSITE_ACCESS_PASSWORD"];
 
@@ -33,9 +33,11 @@ if (process.env.RUN_SERVER === "true") {
     const serverEnvironment = new ServerEnvironment(process.env.PORT);
     LOGINS.forEach(login => serverEnvironment.addLogin(...login));
     serverEnvironment.setKeys(KEY_X, KEY_Y, INBOUND_KEYS, OUTBOUND_KEYS);
-    serverEnvironment.start();
+    if (process.env.SEPARATE_SERVERS === "true") {
+        serverEnvironment.start();
+    }
 
-    if (process.env.RUN_CLIENT !== "nksldjaslkd") {
+    if (process.env.RUN_CLIENT !== "true") {
         async function addData() {
             const data = {};
             data.location = await getLocationData();
@@ -50,7 +52,7 @@ if (process.env.RUN_SERVER === "true") {
     }
 
     if (process.env.WEBSITE_PORT && process.env.WEBSITE_ACCESS_PASSWORD) {
-        const server = new Server(process.env.WEBSITE_PORT);
+        const server = new DualServer(process.env.WEBSITE_PORT);
 
         if (process.env.RUN_WEBSITE === "true") {
             server.publicize("./public");
@@ -67,43 +69,49 @@ if (process.env.RUN_SERVER === "true") {
             response.json(serverEnvironment.lastDatas);
         });
 
-        server.listen(() => console.log(`Website server listening on port ${process.env.WEBSITE_PORT}`));
+        if (process.env.SEPARATE_SERVERS !== "true") {
+            server.on("socket", serverEnvironment.onSocket.bind(serverEnvironment));
+        }
+
+        server.start(() => console.log(`Website server listening on port ${process.env.WEBSITE_PORT}`));
     }
 }
 
-if (process.env.RUN_CLIENT === "true") {
-    const DATA_FLAGS = process.env.DATA_FLAGS.split(",");
+setTimeout(() => {
+    if (process.env.RUN_CLIENT === "true") {
+        const DATA_FLAGS = process.env.DATA_FLAGS.split(",");
 
-    const client = new ClientSocket(process.env.HOST, process.env.PORT, ...LOGINS[0]);
-    client.setKeys(KEY_X, KEY_Y, OUTBOUND_KEYS, INBOUND_KEYS);
-    client.connect().then(validated => {
-        if (!validated) {
-            console.error("Failed to validate");
-            process.exit(1);
-        }
-
-        console.log("Successfully validated");
-        client.on("message", message => console.log("Received message:", message));
-        client.on("close", () => console.log("Connection closed"));
-        sendData();
-
-        async function sendData() {
-            const data = {};
-
-            if (DATA_FLAGS.includes("location")) {
-                data.location = await getLocationData();
+        const client = new ClientSocket(process.env.HOST, process.env.SEPARATE_SERVERS === "true" ? process.env.PORT : process.env.WEBSITE_PORT, ...LOGINS[0]);
+        client.setKeys(KEY_X, KEY_Y, OUTBOUND_KEYS, INBOUND_KEYS);
+        client.connect().then(validated => {
+            if (!validated) {
+                console.error("Failed to validate");
+                process.exit(1);
             }
 
-            if (DATA_FLAGS.includes("weather")) {
-                data.weather = await getWeatherDataAtMe(data.location ?? await getLocationData());
-            }
+            console.log("Successfully validated");
+            client.on("message", message => console.log("Received message:", message));
+            client.on("close", () => console.log("Connection closed"));
+            sendData();
 
-            if (DATA_FLAGS.includes("system")) {
-                data.system = getSystemData();
-            }
+            async function sendData() {
+                const data = {};
 
-            client.send(packetTypes.DATA, JSON.stringify(data));
-            setTimeout(sendData, 1000 * 60);
-        }
-    });
-}
+                if (DATA_FLAGS.includes("location")) {
+                    data.location = await getLocationData();
+                }
+
+                if (DATA_FLAGS.includes("weather")) {
+                    data.weather = await getWeatherDataAtMe(data.location ?? await getLocationData());
+                }
+
+                if (DATA_FLAGS.includes("system")) {
+                    data.system = getSystemData();
+                }
+
+                client.send(packetTypes.DATA, JSON.stringify(data));
+                setTimeout(sendData, 1000 * 60);
+            }
+        });
+    }
+}, 1000)
