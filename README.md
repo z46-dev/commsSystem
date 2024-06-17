@@ -11,7 +11,10 @@ OUTBOUND_SEED=12839
 DATA_FLAGS=location,weather,system
 RUN_SERVER=true
 RUN_CLIENT=false
+SEPARATE_SERVERS=false
 RUN_WEBSITE=false
 WEBSITE_PORT=8080
 WEBSITE_ACCESS_PASSWORD=a_secure_password
+USERNAME=username1
+PASSWORD=password1
 ```
