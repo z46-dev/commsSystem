@@ -6,7 +6,7 @@ import ClientSocket from "./web/ClientSocket.js";
 import { getLocationData, getSystemData, getWeatherDataAtMe } from "./lib/dataParsers.js";
 import DualServer from "./lib/DualServer.js";
 
-const envOptions = ["HOST", "PORT", "LOGINS", "PRIMEN_X", "PRIMEN_Y", "INBOUND_SEED", "OUTBOUND_SEED", "DATA_FLAGS", "RUN_SERVER", "RUN_CLIENT", "RUN_WEBSITE", "WEBSITE_PORT", "SEPARATE_SERVERS", "WEBSITE_ACCESS_PASSWORD"];
+const envOptions = ["HOST", "PORT", "LOGINS", "PRIMEN_X", "PRIMEN_Y", "INBOUND_SEED", "OUTBOUND_SEED", "DATA_FLAGS", "RUN_SERVER", "RUN_CLIENT", "RUN_WEBSITE", "WEBSITE_PORT", "SEPARATE_SERVERS", "WEBSITE_ACCESS_PASSWORD", "USERNAME", "PASSWORD"];
 
 if (!envOptions.every(option => option in process.env)) {
     console.error("Please provide all the required environment variables");
@@ -81,7 +81,7 @@ setTimeout(() => {
     if (process.env.RUN_CLIENT === "true") {
         const DATA_FLAGS = process.env.DATA_FLAGS.split(",");
 
-        const client = new ClientSocket(process.env.HOST, process.env.SEPARATE_SERVERS === "true" ? process.env.PORT : process.env.WEBSITE_PORT, ...LOGINS[0]);
+        const client = new ClientSocket(process.env.HOST, process.env.SEPARATE_SERVERS === "true" ? process.env.PORT : process.env.WEBSITE_PORT, process.env.USERNAME, process.env.PASSWORD);
         client.setKeys(KEY_X, KEY_Y, OUTBOUND_KEYS, INBOUND_KEYS);
         client.connect().then(validated => {
             if (!validated) {
