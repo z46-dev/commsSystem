@@ -2,8 +2,7 @@ if (!localStorage.getItem("siteManagerPassword")) {
     localStorage.setItem("siteManagerPassword", prompt("Enter the site manager password"));
 }
 
-const HOST = location.hostname === "localhost" ? location.host : "jahdakqw3rquryquhfas7q.glitch.me";
-const response = await fetch(location.protocol + "//" + HOST + "/api/data", {
+const response = await fetch("/api/data", {
     method: "POST",
     headers: {
         "Content-Type": "text/plain"
