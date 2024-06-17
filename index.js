@@ -6,7 +6,7 @@ import ClientSocket from "./web/ClientSocket.js";
 import { getLocationData, getSystemData, getWeatherDataAtMe } from "./lib/dataParsers.js";
 import DualServer from "./lib/DualServer.js";
 
-const envOptions = ["HOST", "PORT", "LOGINS", "PRIMEN_X", "PRIMEN_Y", "INBOUND_SEED", "OUTBOUND_SEED", "DATA_FLAGS", "RUN_SERVER", "RUN_CLIENT", "RUN_WEBSITE", "WEBSITE_PORT", "WEBSITE_ACCESS_PASSWORD"];
+const envOptions = ["HOST", "PORT", "LOGINS", "PRIMEN_X", "PRIMEN_Y", "INBOUND_SEED", "OUTBOUND_SEED", "DATA_FLAGS", "RUN_SERVER", "RUN_CLIENT", "RUN_WEBSITE", "WEBSITE_PORT", "SEPARATE_SERVERS", "WEBSITE_ACCESS_PASSWORD"];
 
 if (!envOptions.every(option => option in process.env)) {
     console.error("Please provide all the required environment variables");
